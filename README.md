@@ -34,12 +34,7 @@ Saat menggunakan HalalBites, pengguna dapat mencari restoran, kafe, atau warung 
     Dikerjakan oleh: **Imam Fajri**
 
 
-## iv. Initial Dataset
-[Produk Makanan Halal di Bandung](https://opendata.bandung.go.id/dataset/daftar-fasilitasi-sertifikasi-halal-umkm)
-
-[Link Sheets](https://1drv.ms/x/c/6365abd08b234b2a/EeQthpzNhrRGtGE2MPbSosEBcgjAFlWiyBb797djRM8VLQ?e=15bXzd&nav=MTVfezAwMDAwMDAwLTAwMDEtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMH0)
-
-## v. Role Pengguna
+## iv. Role Pengguna
 - **_User_**
 - **_Admin_**
 
@@ -51,6 +46,5 @@ Saat menggunakan HalalBites, pengguna dapat mencari restoran, kafe, atau warung 
 | 4   | Resto                      | Pengguna dapat menemukan tempat makan halal terdekat dari lokasi pengguna.                                     | Admin dapat menambahkan, mengelola, dan menghapus data lokasi tempat makan halal.                                                    |
 | 5   | Food                       | Pengguna dapat menyaring makanan berdasarkan budget                                                            | Admin dapat menambahkan, mengelola, dan menghapus harga                                                                              |
 
-## vi. Tautan _Deployment_ Aplikasi
-[_HalalBites' Website_](http://erdafa-andikri-halalbites.pbp.cs.ui.ac.id)
+## v. Alur Pengintegrasian
 
