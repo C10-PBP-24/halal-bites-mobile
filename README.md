@@ -47,7 +47,6 @@ Saat menggunakan HalalBites, pengguna dapat mencari restoran, kafe, atau warung 
 | 5   | Food                       | Pengguna dapat menyaring makanan berdasarkan budget                                                            | Admin dapat menambahkan, mengelola, dan menghapus harga                                                                              |
 
 ## v. Alur Pengintegrasian
-## v. Alur Pengintegrasian
 
 1. **Penambahan Library HTTP**
     - Aplikasi Flutter akan ditambahkan library http agar dapat mengirim dan menerima data dari aplikasi web melalui API.
