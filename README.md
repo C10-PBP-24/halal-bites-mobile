@@ -58,4 +58,4 @@ Saat menggunakan HalalBites, pengguna dapat mencari restoran, kafe, atau warung 
     - Library pbp_django_auth akan dimanfaatkan untuk mengatur cookie sehingga semua permintaan (request) yang dikirim ke server bersifat autentik dan terotorisasi.
 
 ## vi. Tautan Desain Aplikasi
-[Tautan Desain Figma Desain Aplikas](https://www.figma.com/design/BHCWjaXI58h5ZtYrAYyXxu/quick-free-food-app-design-figma-template?node-id=2-213&t=nWv16YRA59dMkxQC-1)
+[Tautan Desain Figma Desain Aplikasi](https://www.figma.com/design/BHCWjaXI58h5ZtYrAYyXxu/quick-free-food-app-design-figma-template?node-id=2-213&t=nWv16YRA59dMkxQC-1)
