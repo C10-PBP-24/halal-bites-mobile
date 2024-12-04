@@ -47,7 +47,6 @@ Saat menggunakan HalalBites, pengguna dapat mencari restoran, kafe, atau warung 
 | 5   | Food                       | Pengguna dapat menyaring makanan berdasarkan budget                                                            | Admin dapat menambahkan, mengelola, dan menghapus harga                                                                              |
 
 ## v. Alur Pengintegrasian
-## v. Alur Pengintegrasian
 
 1. **Penambahan Library HTTP**
     - Aplikasi Flutter akan ditambahkan library http agar dapat mengirim dan menerima data dari aplikasi web melalui API.
@@ -57,3 +56,6 @@ Saat menggunakan HalalBites, pengguna dapat mencari restoran, kafe, atau warung 
 
 3. **Pengelolaan Cookie dengan `pbp_django_auth`**
     - Library pbp_django_auth akan dimanfaatkan untuk mengatur cookie sehingga semua permintaan (request) yang dikirim ke server bersifat autentik dan terotorisasi.
+
+## vi. Tautan Desain Aplikasi
+[Tautan Desain Figma Desain Aplikasi](https://www.figma.com/design/BHCWjaXI58h5ZtYrAYyXxu/quick-free-food-app-design-figma-template?node-id=2-213&t=nWv16YRA59dMkxQC-1)
