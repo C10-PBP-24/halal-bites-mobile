@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// Import the Rating model
+import '../models/rating.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -10,38 +12,6 @@ void main() {
   ));
 }
 
-class FoodItem {
-  String name;
-  double rating;
-  String description;
-  List<Review> reviews;
-
-  FoodItem({
-    required this.name,
-    required this.rating,
-    required this.description,
-    required this.reviews,
-  });
-
-  double get averageRating {
-    if (reviews.isEmpty) return 0;
-    double sum = reviews.fold(0, (acc, r) => acc + r.rating);
-    return sum / reviews.length;
-  }
-}
-
-class Review {
-  String reviewerName;
-  double rating;
-  String comment;
-
-  Review({
-    required this.reviewerName,
-    required this.rating,
-    required this.comment,
-  });
-}
-
 class FoodReviewPage extends StatefulWidget {
   const FoodReviewPage({Key? key}) : super(key: key);
 
@@ -50,41 +20,63 @@ class FoodReviewPage extends StatefulWidget {
 }
 
 class _FoodReviewPageState extends State<FoodReviewPage> {
-  List<FoodItem> allFoods = [
-    FoodItem(
-      name: "Margherita Pizza",
-      rating: 4.5,
-      description: "A classic pizza with fresh tomatoes, mozzarella and basil.",
-      reviews: [
-        Review(reviewerName: "Alice", rating: 5, comment: "Delicious!"),
-        Review(reviewerName: "Bob", rating: 4, comment: "Quite good."),
-      ],
+  // Replace List<FoodItem> with List<Rating>
+  List<Rating> allRatings = [
+    Rating(
+      id: '1',
+      food: Food(id: '1', name: 'Margherita Pizza'),
+      user: User(id: '1', username: 'Alice'),
+      rating: 5,
+      description: 'Delicious!',
+      createdAt: DateTime.now(),
     ),
-    FoodItem(
-      name: "House Special Pizza",
-      rating: 4.7,
-      description: "Loaded with sausage, mushrooms, olives, peppers, and onions.",
-      reviews: [
-        Review(reviewerName: "Carol", rating: 5, comment: "My favorite!"),
-        Review(reviewerName: "Dan", rating: 4.5, comment: "Really tasty."),
-      ],
+    Rating(
+      id: '2',
+      food: Food(id: '1', name: 'Margherita Pizza'),
+      user: User(id: '2', username: 'Bob'),
+      rating: 4,
+      description: 'Quite good.',
+      createdAt: DateTime.now(),
     ),
-    FoodItem(
-      name: "Vegetarian Pizza",
-      rating: 4.3,
-      description: "A healthy mix of broccoli, mushrooms, olives, and peppers.",
-      reviews: [
-        Review(reviewerName: "Eve", rating: 4, comment: "Good flavors."),
-      ],
+    Rating(
+      id: '3',
+      food: Food(id: '2', name: 'House Special Pizza'),
+      user: User(id: '3', username: 'Carol'),
+      rating: 5,
+      description: 'My favorite!',
+      createdAt: DateTime.now(),
     ),
-    FoodItem(
-      name: "Meat Eaters Pizza",
-      rating: 4.8,
-      description: "Pepperoni, sausage, meatballs, and ham for carnivores.",
-      reviews: [
-        Review(reviewerName: "Frank", rating: 5, comment: "Fantastic!"),
-        Review(reviewerName: "Grace", rating: 4.5, comment: "Great taste."),
-      ],
+    Rating(
+      id: '4',
+      food: Food(id: '2', name: 'House Special Pizza'),
+      user: User(id: '4', username: 'Dan'),
+      rating: 4,
+      description: 'Really tasty.',
+      createdAt: DateTime.now(),
+    ),
+    Rating(
+      id: '5',
+      food: Food(id: '3', name: 'Vegetarian Pizza'),
+      user: User(id: '5', username: 'Eve'),
+      rating: 4,
+      description: 'Good flavors.',
+      createdAt: DateTime.now(),
+    ),
+    Rating(
+      id: '6',
+      food: Food(id: '4', name: 'Meat Eaters Pizza'),
+      user: User(id: '6', username: 'Frank'),
+      rating: 5,
+      description: 'Fantastic!',
+      createdAt: DateTime.now(),
+    ),
+    Rating(
+      id: '7',
+      food: Food(id: '4', name: 'Meat Eaters Pizza'),
+      user: User(id: '7', username: 'Grace'),
+      rating: 4,
+      description: 'Great taste.',
+      createdAt: DateTime.now(),
     ),
   ];
 
@@ -104,15 +96,26 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Filter foods based on search
-    List<FoodItem> filteredFoods = allFoods.where((food) {
-      return food.name.toLowerCase().contains(searchQuery.toLowerCase());
+    // Filter ratings based on the search query
+    List<Rating> filteredRatings = allRatings.where((rating) {
+      return rating.food.name.toLowerCase().contains(searchQuery.toLowerCase());
     }).toList();
 
-    // Sort by rating to get top rated
-    List<FoodItem> sortedByRating = List.from(allFoods);
-    sortedByRating.sort((a, b) => b.averageRating.compareTo(a.averageRating));
-    List<FoodItem> topRated = sortedByRating.take(3).toList();
+    // Group ratings by food to calculate average ratings
+    Map<String, List<Rating>> ratingsByFood = {};
+    for (var rating in allRatings) {
+      ratingsByFood.putIfAbsent(rating.food.name, () => []).add(rating);
+    }
+
+    // Calculate average ratings for each food
+    List<MapEntry<String, double>> averageRatings = ratingsByFood.entries.map((entry) {
+      double avg = entry.value.fold(0, (sum, r) => sum + r.rating) / entry.value.length;
+      return MapEntry(entry.key, avg);
+    }).toList();
+
+    // Sort to get top-rated foods
+    averageRatings.sort((a, b) => b.value.compareTo(a.value));
+    List<MapEntry<String, double>> topRated = averageRatings.take(3).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -160,13 +163,18 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
                   ),
                   const SizedBox(height: 8),
                   Column(
-                    children: topRated.map((food) {
+                    children: topRated.map((entry) {
+                      String foodName = entry.key;
+                      double avgRating = entry.value;
                       return InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => FoodDetailPage(food: food),
+                              builder: (_) => FoodDetailPage(
+                                foodName: foodName,
+                                ratings: ratingsByFood[foodName]!,
+                              ),
                             ),
                           );
                         },
@@ -183,7 +191,7 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
                                 CircleAvatar(
                                   backgroundColor: Colors.yellow[700],
                                   child: Text(
-                                    food.averageRating.toStringAsFixed(1),
+                                    avgRating.toStringAsFixed(1),
                                     style: const TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold),
@@ -194,13 +202,12 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      food.name,
+                                      foodName,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
                                     ),
-                                    Text(
-                                        "Rating: ${food.averageRating.toStringAsFixed(1)} ★"),
+                                    Text("Rating: ${avgRating.toStringAsFixed(1)} ★"),
                                   ],
                                 ),
                               ],
@@ -244,13 +251,19 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Column(
-                children: filteredFoods.map((food) {
+                children: ratingsByFood.keys.map((foodName) {
+                  double avgRating = ratingsByFood[foodName]!
+                      .fold(0, (sum, r) => sum + r.rating) /
+                      ratingsByFood[foodName]!.length;
                   return InkWell(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => FoodDetailPage(food: food),
+                          builder: (_) => FoodDetailPage(
+                            foodName: foodName,
+                            ratings: ratingsByFood[foodName]!,
+                          ),
                         ),
                       );
                     },
@@ -262,11 +275,10 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
                         padding: const EdgeInsets.all(8.0),
                         child: ListTile(
                           title: Text(
-                            food.name,
+                            foodName,
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          subtitle: Text(
-                              "Rating: ${food.averageRating.toStringAsFixed(1)} ★"),
+                          subtitle: Text("Rating: ${avgRating.toStringAsFixed(1)} ★"),
                         ),
                       ),
                     ),
@@ -366,32 +378,19 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
                             String name = _foodNameController.text.trim();
                             String desc = _descriptionController.text.trim();
                             if (name.isEmpty) return;
-                            // Check if food exists
-                            FoodItem existing = allFoods.firstWhere(
-                              (f) => f.name.toLowerCase() == name.toLowerCase(),
-                              orElse: () => FoodItem(
-                                name: name,
-                                rating: 0,
-                                description:
-                                    desc.isEmpty ? "No description" : desc,
-                                reviews: [],
-                              ),
-                            );
 
-                            if (!allFoods.contains(existing)) {
-                              allFoods.add(existing);
-                            }
-
-                            existing.reviews.add(
-                              Review(
-                                reviewerName: "Anonymous",
-                                rating: _selectedRating,
-                                comment: desc,
-                              ),
+                            // Create new Rating instance
+                            Rating newRating = Rating(
+                              id: DateTime.now().toString(),
+                              food: Food(id: 'new', name: name),
+                              user: User(id: 'anonymous', username: 'Anonymous'),
+                              rating: _selectedRating.toInt(),
+                              description: desc.isEmpty ? "No description" : desc,
+                              createdAt: DateTime.now(),
                             );
 
                             setState(() {
-                              // Update UI
+                              allRatings.add(newRating);
                             });
 
                             // Clear fields
@@ -425,19 +424,20 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
 }
 
 class FoodDetailPage extends StatelessWidget {
-  final FoodItem food;
+  final String foodName;
+  final List<Rating> ratings;
 
-  const FoodDetailPage({Key? key, required this.food}) : super(key: key);
+  const FoodDetailPage({Key? key, required this.foodName, required this.ratings})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<Review> reviews = food.reviews;
-    double avgRating = food.averageRating;
+    double avgRating = ratings.fold(0, (sum, r) => sum + r.rating) / ratings.length;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          food.name,
+          foodName,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.yellow[700],
@@ -448,7 +448,7 @@ class FoodDetailPage extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                food.name,
+                foodName,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -461,7 +461,7 @@ class FoodDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                food.description,
+                ratings.first.food.name,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -471,7 +471,7 @@ class FoodDetailPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Column(
-                children: reviews.map((r) {
+                children: ratings.map((r) {
                   return Card(
                     elevation: 2,
                     shape: RoundedRectangleBorder(
@@ -479,10 +479,11 @@ class FoodDetailPage extends StatelessWidget {
                     ),
                     child: ListTile(
                       title: Text(
-                        r.reviewerName,
+                        r.user.username,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text("${r.rating} ★ - ${r.comment}"),
+                      subtitle:
+                          Text("${r.rating} ★ - ${r.description}"),
                     ),
                   );
                 }).toList(),
