@@ -19,14 +19,14 @@ class MyApp extends StatelessWidget {
         return request;
       },
       child: MaterialApp(
-        title: 'Mental Health Tracker',
+        title: 'Halal Bites',
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: ColorScheme.fromSwatch(
             primarySwatch: Colors.deepPurple,
           ).copyWith(secondary: Colors.deepPurple[400]),
         ),
-        home: LoginPage(),
+        home: RestoPage(),
       ),
     );
   }
