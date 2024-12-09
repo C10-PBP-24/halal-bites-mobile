@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:halal_bites/main/navbar.dart';
+import 'package:halal_bites/auth/login.dart';
+import 'package:halal_bites/resto/list_resto.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,19 +11,23 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Halal Bites',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(
-          primarySwatch: Colors.yellow,
-        ).copyWith(secondary: const Color.fromRGBO(255, 238, 169, 100)),
-        useMaterial3: true,
+    return Provider(
+      create: (_) {
+        CookieRequest request = CookieRequest();
+        return request;
+      },
+      child: MaterialApp(
+        title: 'Halal Bites',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.deepPurple,
+          ).copyWith(secondary: Colors.deepPurple[400]),
+        ),
+        home: RestoPage(),
       ),
-      home: Navbar(),
     );
   }
 }
