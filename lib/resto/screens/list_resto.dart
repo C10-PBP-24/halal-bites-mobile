@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:halal_bites/models/resto.dart';
-import 'package:halal_bites/resto/resto_form.dart';
+import 'package:halal_bites/resto/models/resto.dart';
+import 'package:halal_bites/resto/screens/resto_form.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
