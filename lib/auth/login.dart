@@ -1,6 +1,7 @@
 // import 'package:halal-bites/screens/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:halal_bites/auth/register.dart';
+import 'package:halal_bites/main/menu.dart';
 import 'package:halal_bites/resto/screens/list_resto.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -117,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => RestoPage()),
+                                builder: (context) => MenuPage()),
                           );
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
