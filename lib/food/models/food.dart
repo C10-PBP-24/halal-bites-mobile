@@ -36,7 +36,7 @@ class Fields {
     String name;
     String price;
     String image;
-    Promo promo;
+    String promo;
 
     Fields({
         required this.name,
@@ -49,32 +49,17 @@ class Fields {
         name: json["name"],
         price: json["price"],
         image: json["image"],
-        promo: promoValues.map[json["promo"]]!,
+        promo: json["promo"],
     );
 
     Map<String, dynamic> toJson() => {
         "name": name,
         "price": price,
         "image": image,
-        "promo": promoValues.reverse[promo],
+        "promo": promo,
     };
 }
 
-enum Promo {
-    BUY_1_GET_1,
-    CASHBACK_20,
-    DISCOUNT_10,
-    FREE_SHIPPING,
-    NO_PROMO
-}
-
-final promoValues = EnumValues({
-    "Buy 1 Get 1": Promo.BUY_1_GET_1,
-    "Cashback 20%": Promo.CASHBACK_20,
-    "Discount 10%": Promo.DISCOUNT_10,
-    "Free Shipping": Promo.FREE_SHIPPING,
-    "No Promo": Promo.NO_PROMO
-});
 
 enum Model {
     FOOD_FOOD

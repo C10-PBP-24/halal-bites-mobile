@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:halal_bites/auth/register.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:halal_bites/food/menu.dart';
+import 'package:halal_bites/food/screen/menu_food.dart';
 
 void main() {
   runApp(const LoginApp());
