@@ -164,10 +164,7 @@ class _AddFoodPageState extends State<AddFoodPage> {
                                 content: Text("Makanan berhasil ditambahkan!"),
                               ),
                             );
-                            Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => MenuPage()),
-                                  );
+                            Navigator.pop(context);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

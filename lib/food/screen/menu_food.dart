@@ -89,7 +89,7 @@ class _MenuPageState extends State<MenuPage> {
                   }else{
                     List<Food> filteredList = snapshot.data!.where((food) {
                       final double price = double.parse(food.fields.price.toString());
-                      final priceMatches = budgetFilter == 0 || price >= budgetFilter;
+                      final priceMatches = budgetFilter == 0 || price <= budgetFilter;
                       return priceMatches;
                     }).toList();
                     return ListView.builder(
