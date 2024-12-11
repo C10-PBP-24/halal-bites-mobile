@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:halal_bites/forum/models/post_entry.dart';
+import 'package:halal_bites/forum/widgets/post_form.dart';
 
 class PostListPage extends StatefulWidget {
   final int threadId;
@@ -93,7 +94,15 @@ class _PostListPageState extends State<PostListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Implementasi untuk menambah post baru
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PostFormPage(
+                threadId: widget.threadId,
+                threadTitle: widget.threadTitle,
+              ),
+            ),
+          );
         },
         backgroundColor: Colors.blue,
         child: const Icon(Icons.add, color: Colors.white),

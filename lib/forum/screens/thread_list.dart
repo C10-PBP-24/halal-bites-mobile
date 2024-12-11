@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';  // Assuming you have authentication setup
 import 'package:halal_bites/forum/models/thread_entry.dart';  // Import your Thread model here
+import 'package:halal_bites/forum/widgets/thread_form.dart';
 
 class ThreadPage extends StatefulWidget {
   const ThreadPage({super.key});
@@ -87,7 +88,12 @@ class _ThreadPageState extends State<ThreadPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Add post logic or navigation
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ThreadFormPage(),
+            ),
+          );
         },
         backgroundColor: Colors.blue,
         child: const Icon(Icons.add, color: Colors.white),
