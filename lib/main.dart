@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:halal_bites/auth/login.dart';
-import 'package:halal_bites/resto/list_resto.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:halal_bites/rating/screens/rated_foods.dart';
+import 'package:halal_bites/resto/screens/list_resto.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.deepPurple,
           ).copyWith(secondary: Colors.deepPurple[400]),
         ),
-        home: RestoPage(),
+        home: LoginPage(),
       ),
     );
   }
