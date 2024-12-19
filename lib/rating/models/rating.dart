@@ -27,8 +27,14 @@ class Rating {
 
     factory Rating.fromJson(Map<String, dynamic> json) => Rating(
         id: json["id"].toString(),
-        food: Food.fromJson(json["food"]),
-        user: User.fromJson(json["user"]),
+        food: Food(
+            id: json["food_id"].toString(),
+            name: json["food__name"],
+        ),
+        user: User(
+            id: json["user_id"].toString(),
+            username: json["user__username"],
+        ),
         rating: json["rating"],
         description: json["description"],
         createdAt: DateTime.parse(json["created_at"]),

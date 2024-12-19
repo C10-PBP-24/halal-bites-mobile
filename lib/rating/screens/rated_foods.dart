@@ -30,7 +30,7 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
   }
 
   Future<void> fetchRatings() async {
-    final response = await http.get(Uri.parse('http://localhost:8000/rating/rated-foods/json/'));
+    final response = await http.get(Uri.parse('http://localhost:8000/rating/json/'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
