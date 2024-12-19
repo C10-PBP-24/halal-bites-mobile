@@ -42,8 +42,10 @@ class Rating {
 
     Map<String, dynamic> toJson() => {
         "id": id,
-        "food": food.toJson(),
-        "user": user.toJson(),
+        "food_id": food.id,
+        "food__name": food.name,
+        "user_id": user.id,
+        "user__username": user.username,
         "rating": rating,
         "description": description,
         "created_at": createdAt.toIso8601String(),

@@ -43,6 +43,27 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
     }
   }
 
+  Future<void> submitReview(String name, int rating, String description) async {
+    final url = Uri.parse('http://localhost:8000/rating/create_rating_flutter/');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'food_id': name, // Adjust according to your Django model
+        'rating': rating,
+        'description': description,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Review submitted successfully');
+    } else {
+      print('Failed to submit review');
+    }
+  }
+
   String searchQuery = "";
 
   // For the modal dialog form
@@ -355,6 +376,9 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
                             setState(() {
                               allRatings.add(newRating);
                             });
+
+                            // Send review to Django backend
+                            await submitReview(name, newRating.rating, desc);
 
                             // Clear fields
                             _foodNameController.clear();
