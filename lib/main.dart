@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.deepPurple,
           ).copyWith(secondary: Colors.deepPurple[400]),
         ),
-        home: RestoPage(),
+        home: const FoodReviewPage(),
       ),
     );
   }
