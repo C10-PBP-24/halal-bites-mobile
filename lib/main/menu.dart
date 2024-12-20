@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:halal_bites/food_tracker/screens/food_tracker.dart';
 import 'package:halal_bites/rating/screens/rated_foods.dart';
 import 'package:halal_bites/resto/screens/list_resto.dart';
+import 'package:halal_bites/food/screen/menu_food.dart';
 
 // Halaman Menu dengan navigasi
 class MenuPage extends StatelessWidget {
@@ -17,6 +18,15 @@ class MenuPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => RestoPage()),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('Food Page'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FoodPage()),
               );
             },
           ),
@@ -38,15 +48,6 @@ class MenuPage extends StatelessWidget {
               );
             },
           ),
-          // ListTile(
-          //   title: Text('Food Page'),
-          //   onTap: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (context) => FoodPage()),
-          //     );
-          //   },
-          // ),
           // ListTile(
           //   title: Text('Forum Page'),
           //   onTap: () {
