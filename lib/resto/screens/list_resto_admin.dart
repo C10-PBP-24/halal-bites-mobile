@@ -8,14 +8,14 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
-class RestoPage extends StatefulWidget {
-  const RestoPage({super.key});
+class RestoPageAdmin extends StatefulWidget {
+  const RestoPageAdmin({super.key});
 
   @override
-  State<RestoPage> createState() => _RestoPageState();
+  State<RestoPageAdmin> createState() => _RestoPageState();
 }
 
-class _RestoPageState extends State<RestoPage> {
+class _RestoPageState extends State<RestoPageAdmin> {
   List<Resto> filteredList = [];
   String nameFilter = '';
   String locationFilter = '';

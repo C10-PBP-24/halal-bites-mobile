@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:halal_bites/food_tracker/screens/food_tracker.dart';
 import 'package:halal_bites/rating/screens/rated_foods.dart';
-import 'package:halal_bites/resto/screens/list_resto.dart';
 import 'package:halal_bites/food/screen/food_user.dart';
+import 'package:halal_bites/resto/screens/list_resto_user.dart';
 
 // Halaman Menu dengan navigasi
 class MenuUserPage extends StatelessWidget {
@@ -17,7 +17,7 @@ class MenuUserPage extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => RestoPage()),
+                MaterialPageRoute(builder: (context) => RestoPageUser()),
               );
             },
           ),

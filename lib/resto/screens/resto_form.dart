@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:halal_bites/resto/screens/list_resto.dart';
+import 'package:halal_bites/resto/screens/list_resto_admin.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -224,12 +224,12 @@ class _RestoFormPageState extends State<RestoFormPage> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Restaurant successfully added!"),
-                                  backgroundColor: Color.fromARGB(255, 3, 90, 6),
+                                  backgroundColor: Color.fromARGB(255, 200, 247, 202),
                                 ),
                               );
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (context) => RestoPage()),
+                                MaterialPageRoute(builder: (context) => RestoPageAdmin()),
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
