@@ -33,10 +33,8 @@ class _RestoPageState extends State<RestoPage> {
         }
       }
     }
-    
     return listResto;
   }
-
 
   Future<void> fetchCsrfToken() async {
     final url = Uri.parse('http://127.0.0.1:8000/resto/get-csrf-token/');
@@ -56,6 +54,65 @@ class _RestoPageState extends State<RestoPage> {
     }
   }
 
+  Future<void> showDeleteConfirmationDialog(BuildContext context, Resto resto) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text(
+            'Confirm Delete',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: RichText(
+            text: TextSpan(
+              style: const TextStyle(color: Colors.black),
+              children: [
+                const TextSpan(text: 'Are you sure you want to delete '),
+                TextSpan(
+                  text: resto.fields.nama,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
+                ),
+                const TextSpan(text: '?'),
+              ],
+            ),
+          ),
+          backgroundColor: Colors.yellow.shade50,
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey[800]),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                deleteRestoById(resto.pk); // Proceed with deletion
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> deleteRestoById(int id) async {
     if (csrfToken == null) {
       await fetchCsrfToken();
@@ -73,17 +130,38 @@ class _RestoPageState extends State<RestoPage> {
       );
 
       if (response.statusCode == 204) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Deleted successfully'),
-            duration: Duration(seconds: 2), // Customize duration as needed
-          ),
-        );
-        setState(() {});
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Restaurant deleted successfully'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
+            ),
+          );
+          setState(() {}); // Refresh the list
+        }
       } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to delete restaurant'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
         print('Failed to delete: ${response.statusCode}');
       }
     } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error occurred while deleting'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
       print('Error: $e');
     }
   }
@@ -91,63 +169,125 @@ class _RestoPageState extends State<RestoPage> {
   @override
   void initState() {
     super.initState();
-    fetchCsrfToken(); // Fetch CSRF token when the widget initializes
+    fetchCsrfToken();
   }
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Restaurants'),
-        backgroundColor: Colors.yellow[700],
-        elevation: 0,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.yellow.shade700, Colors.orange.shade600],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                offset: Offset(0, 2),
+                blurRadius: 4.0,
+              ),
+            ],
+          ),
+          child: AppBar(
+            title: const Text('Restaurants'),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          ),
+        ),
       ),
-      body: Row(
+      body: Column(
         children: [
-          // Filter Section
           Container(
-            width: 250,
-            color: Colors.grey[200],
             padding: const EdgeInsets.all(16.0),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.yellow.shade700, Colors.orange.shade600],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Filter Restaurants',
+                  'Filter',
                   style: TextStyle(
+                    fontSize: 18.0,
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    color: Colors.black,
                   ),
                 ),
-                const SizedBox(height: 16),
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'Nama:',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      nameFilter = value.toLowerCase();
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  decoration: const InputDecoration(
-                    labelText: 'Lokasi:',
-                    border: OutlineInputBorder(),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      locationFilter = value.toLowerCase();
-                    });
-                  },
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        cursorColor: const Color.fromARGB(255, 3, 90, 6),
+                        decoration: InputDecoration(
+                          labelText: 'Nama:',
+                          floatingLabelStyle: const TextStyle(
+                            color: Color.fromARGB(255, 3, 90, 6),
+                            fontWeight: FontWeight.bold,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(255, 3, 90, 6),
+                              width: 2.0,
+                            ),
+                          ),
+                          prefixIcon: const Icon(Icons.auto_awesome, color: Colors.black),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            nameFilter = value.toLowerCase();
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextField(
+                        cursorColor: const Color.fromARGB(255, 3, 90, 6),
+                        decoration: InputDecoration(
+                          labelText: 'Lokasi:',
+                          floatingLabelStyle: const TextStyle(
+                            color: Color.fromARGB(255, 3, 90, 6),
+                            fontWeight: FontWeight.bold,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromARGB(255, 3, 90, 6),
+                              width: 2.0,
+                            ),
+                          ),
+                          prefixIcon: const Icon(Icons.location_on, color: Colors.black),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            locationFilter = value.toLowerCase();
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          // List Section
           Expanded(
             child: FutureBuilder(
               future: fetchResto(request),
@@ -173,88 +313,74 @@ class _RestoPageState extends State<RestoPage> {
                     final nameMatches = nameFilter.isEmpty ||
                         resto.fields.nama.toLowerCase().contains(nameFilter);
                     final locationMatches = locationFilter.isEmpty ||
-                        resto.fields.lokasi
-                            .toString()
-                            .toLowerCase()
-                            .contains(locationFilter);
+                        resto.fields.lokasi.toString().toLowerCase().contains(locationFilter);
                     return nameMatches && locationMatches;
                   }).toList();
 
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 3 / 2,
-                      ),
-                      itemCount: filteredList.length,
-                      itemBuilder: (_, index) => Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Padding(
+                  return ListView.builder(
+                    itemCount: filteredList.length,
+                    itemBuilder: (_, index) {
+                      final resto = filteredList[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RestoDetailPage(resto: resto),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                           padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.yellow.shade100, Colors.yellow.shade300],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(12.0),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                offset: Offset(0, 4),
+                                blurRadius: 6.0,
+                              ),
+                            ],
+                          ),
+                          child: Row(
                             children: [
-                              Text(
-                                "${filteredList[index].fields.nama}",
-                                style: const TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                "Lokasi: ${lokasiValues.reverse[filteredList[index].fields.lokasi]}",
-                                style: const TextStyle(fontSize: 14.0),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                              const Icon(Icons.restaurant, color: Colors.black),
+                              const SizedBox(width: 10),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => RestoDetailPage(
-                                            resto: filteredList[index], // Pass the Resto object
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.grey,
-                                    ),
-                                    child: const Text(
-                                      'Lihat Detail',
-                                      style: TextStyle(color: Colors.black),
+                                  Text(
+                                    resto.fields.nama,
+                                    style: const TextStyle(
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      deleteRestoById(filteredList[index].pk);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red,
-                                    ),
-                                    child: const Text(
-                                      'Hapus',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    "Lokasi: ${lokasiValues.reverse[filteredList[index].fields.lokasi]}",
+                                    style: const TextStyle(fontSize: 14.0),
                                   ),
                                 ],
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {
+                                  showDeleteConfirmationDialog(context, resto);
+                                },
                               ),
                             ],
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   );
                 }
               },
@@ -267,12 +393,15 @@ class _RestoPageState extends State<RestoPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => RestoFormPage(), // Navigate to form page
+              builder: (context) => const RestoFormPage(),
             ),
           );
         },
         backgroundColor: Colors.yellow[700],
         child: const Icon(Icons.add, color: Colors.black),
+        elevation: 10.0,
+        splashColor: Colors.yellow.shade200,
+        tooltip: 'Add New Restaurant',
       ),
     );
   }
