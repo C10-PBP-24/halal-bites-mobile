@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-// Import the Rating model
-import '../models/rating.dart';
+import 'package:halal_bites/rating/models/rating.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(MaterialApp(
@@ -20,65 +21,48 @@ class FoodReviewPage extends StatefulWidget {
 }
 
 class _FoodReviewPageState extends State<FoodReviewPage> {
-  // Replace List<FoodItem> with List<Rating>
-  List<Rating> allRatings = [
-    Rating(
-      id: '1',
-      food: Food(id: '1', name: 'Margherita Pizza'),
-      user: User(id: '1', username: 'Alice'),
-      rating: 5,
-      description: 'Delicious!',
-      createdAt: DateTime.now(),
-    ),
-    Rating(
-      id: '2',
-      food: Food(id: '1', name: 'Margherita Pizza'),
-      user: User(id: '2', username: 'Bob'),
-      rating: 4,
-      description: 'Quite good.',
-      createdAt: DateTime.now(),
-    ),
-    Rating(
-      id: '3',
-      food: Food(id: '2', name: 'House Special Pizza'),
-      user: User(id: '3', username: 'Carol'),
-      rating: 5,
-      description: 'My favorite!',
-      createdAt: DateTime.now(),
-    ),
-    Rating(
-      id: '4',
-      food: Food(id: '2', name: 'House Special Pizza'),
-      user: User(id: '4', username: 'Dan'),
-      rating: 4,
-      description: 'Really tasty.',
-      createdAt: DateTime.now(),
-    ),
-    Rating(
-      id: '5',
-      food: Food(id: '3', name: 'Vegetarian Pizza'),
-      user: User(id: '5', username: 'Eve'),
-      rating: 4,
-      description: 'Good flavors.',
-      createdAt: DateTime.now(),
-    ),
-    Rating(
-      id: '6',
-      food: Food(id: '4', name: 'Meat Eaters Pizza'),
-      user: User(id: '6', username: 'Frank'),
-      rating: 5,
-      description: 'Fantastic!',
-      createdAt: DateTime.now(),
-    ),
-    Rating(
-      id: '7',
-      food: Food(id: '4', name: 'Meat Eaters Pizza'),
-      user: User(id: '7', username: 'Grace'),
-      rating: 4,
-      description: 'Great taste.',
-      createdAt: DateTime.now(),
-    ),
-  ];
+  List<Rating> allRatings = []; // Initialize as empty list
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRatings();
+  }
+
+  Future<void> fetchRatings() async {
+    final response = await http.get(Uri.parse('http://localhost:8000/rating/json/'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      setState(() {
+        allRatings = data.map((json) => Rating.fromJson(json)).toList();
+      });
+    } else {
+      // Handle error
+      print('Failed to load ratings');
+    }
+  }
+
+  Future<void> submitReview(String name, int rating, String description) async {
+    final url = Uri.parse('http://localhost:8000/rating/create_rating_flutter/');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'food_id': name, // Adjust according to your Django model
+        'rating': rating,
+        'description': description,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Review submitted successfully');
+    } else {
+      print('Failed to submit review');
+    }
+  }
 
   String searchQuery = "";
 
@@ -392,6 +376,9 @@ class _FoodReviewPageState extends State<FoodReviewPage> {
                             setState(() {
                               allRatings.add(newRating);
                             });
+
+                            // Send review to Django backend
+                            await submitReview(name, newRating.rating, desc);
 
                             // Clear fields
                             _foodNameController.clear();
