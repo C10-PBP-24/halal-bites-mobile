@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:halal_bites/auth/register.dart';
-import 'package:halal_bites/main/menu.dart';
+import 'package:halal_bites/main/menu_admin.dart';
+import 'package:halal_bites/main/menu_user.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -123,11 +124,26 @@ class _LoginPageState extends State<LoginPage> {
                             if (request.loggedIn) {
                               String message = response['message'];
                               String uname = response['username'];
+                              String role = response['role'];
                               if (context.mounted) {
+                                if (role == 'admin') {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => MenuAdminPage()),
+                                  );
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar()
+                                    ..showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "$message Selamat datang, $uname.")),
+                                    );
+                                } else {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => MenuPage()),
+                                      builder: (context) => MenuUserPage()),
                                 );
                                 ScaffoldMessenger.of(context)
                                   ..hideCurrentSnackBar()
@@ -136,6 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                                         content: Text(
                                             "$message Selamat datang, $uname.")),
                                   );
+                                }
                               }
                             } else {
                               if (context.mounted) {
