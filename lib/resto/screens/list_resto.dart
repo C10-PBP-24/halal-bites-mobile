@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:halal_bites/resto/models/resto.dart';
+import 'package:halal_bites/resto/screens/resto_detail.dart';
 import 'package:halal_bites/resto/screens/resto_form.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -13,32 +16,71 @@ class RestoPage extends StatefulWidget {
 }
 
 class _RestoPageState extends State<RestoPage> {
+  List<Resto> filteredList = [];
+  String nameFilter = '';
+  String locationFilter = '';
+  String? csrfToken;
+
   Future<List<Resto>> fetchResto(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/resto/json/');
-    var data = response;
     List<Resto> listResto = [];
-    for (var d in data) {
+    for (var d in response) {
       if (d != null) {
-        listResto.add(Resto.fromJson(d));
+        try {
+          listResto.add(Resto.fromJson(d));
+        } catch (e) {
+          print('Error parsing Resto for data: $d');          
+        }
       }
     }
+    
     return listResto;
   }
 
-  Future<void> deleteResto(int id) async {
+
+  Future<void> fetchCsrfToken() async {
+    final url = Uri.parse('http://127.0.0.1:8000/resto/get-csrf-token/');
+    try {
+      final response = await http.get(url, headers: {
+        'Content-Type': 'application/json',
+      });
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        csrfToken = data['csrfToken'];
+      } else {
+        print('Failed to fetch CSRF token: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching CSRF token: $e');
+    }
+  }
+
+  Future<void> deleteRestoById(int id) async {
+    if (csrfToken == null) {
+      await fetchCsrfToken();
+    }
+
     final url = Uri.parse('http://127.0.0.1:8000/resto/delete-resto/$id/');
-    
+
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken!,
+        },
       );
-      
+
       if (response.statusCode == 204) {
-        // Successfully deleted
-        print('Restaurant deleted');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Deleted successfully'),
+            duration: Duration(seconds: 2), // Customize duration as needed
+          ),
+        );
+        setState(() {});
       } else {
-        // Error handling
         print('Failed to delete: ${response.statusCode}');
       }
     } catch (e) {
@@ -46,8 +88,11 @@ class _RestoPageState extends State<RestoPage> {
     }
   }
 
-  String nameFilter = '';
-  String locationFilter = '';
+  @override
+  void initState() {
+    super.initState();
+    fetchCsrfToken(); // Fetch CSRF token when the widget initializes
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,14 +144,6 @@ class _RestoPageState extends State<RestoPage> {
                     });
                   },
                 ),
-                const SizedBox(height: 16),
-                // ElevatedButton(
-                //   onPressed: () {},
-                //   style: ElevatedButton.styleFrom(
-                //     backgroundColor: Colors.black,
-                //   ),
-                //   child: const Text('Filter'),
-                // ),
               ],
             ),
           ),
@@ -115,97 +152,110 @@ class _RestoPageState extends State<RestoPage> {
             child: FutureBuilder(
               future: fetchResto(request),
               builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.data == null) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                } else if (!snapshot.hasData || snapshot.data.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No data available.',
+                      style: TextStyle(fontSize: 20, color: Colors.grey),
+                    ),
+                  );
                 } else {
-                  if (!snapshot.hasData) {
-                    return const Center(
-                      child: Text(
-                        'No data available.',
-                        style: TextStyle(fontSize: 20, color: Colors.grey),
-                      ),
-                    );
-                  } else {
-                    List<Resto> filteredList = snapshot.data!.where((resto) {
-                      final nameMatches = nameFilter.isEmpty ||
-                          resto.fields.nama.toLowerCase().contains(nameFilter);
-                      final locationMatches = locationFilter.isEmpty ||
-                          resto.fields.lokasi
-                              .toString()
-                              .toLowerCase()
-                              .contains(locationFilter);
-                      return nameMatches && locationMatches;
-                    }).toList();
+                  List<Resto> filteredList = snapshot.data!.where((resto) {
+                    final nameMatches = nameFilter.isEmpty ||
+                        resto.fields.nama.toLowerCase().contains(nameFilter);
+                    final locationMatches = locationFilter.isEmpty ||
+                        resto.fields.lokasi
+                            .toString()
+                            .toLowerCase()
+                            .contains(locationFilter);
+                    return nameMatches && locationMatches;
+                  }).toList();
 
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 3 / 2,
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 3 / 2,
+                      ),
+                      itemCount: filteredList.length,
+                      itemBuilder: (_, index) => Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        itemCount: filteredList.length,
-                        itemBuilder: (_, index) => Card(
-                          elevation: 4,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "${filteredList[index].fields.nama}",
-                                  style: const TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${filteredList[index].fields.nama}",
+                                style: const TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "Lokasi: ${lokasiValues.reverse[filteredList[index].fields.lokasi]}",
+                                style: const TextStyle(fontSize: 14.0),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => RestoDetailPage(
+                                            resto: filteredList[index], // Pass the Resto object
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey,
+                                    ),
+                                    child: const Text(
+                                      'Lihat Detail',
+                                      style: TextStyle(color: Colors.black),
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  "Lokasi: ${filteredList[index].fields.lokasi}",
-                                  style: const TextStyle(fontSize: 14.0),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        // Detail navigation logic
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.grey,
-                                      ),
-                                      child: const Text(
-                                        'Lihat Detail',
-                                        style: TextStyle(color: Colors.black),
-                                      ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      deleteRestoById(filteredList[index].pk);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
                                     ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        deleteResto(filteredList[index].pk);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                      ),
-                                      child: const Text(
-                                        'Hapus',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
+                                    child: const Text(
+                                      'Hapus',
+                                      style: TextStyle(color: Colors.white),
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    );
-                  }
+                    ),
+                  );
                 }
               },
             ),
@@ -226,8 +276,4 @@ class _RestoPageState extends State<RestoPage> {
       ),
     );
   }
-}
-
-extension on CookieRequest {
-  delete(String s) {}
 }

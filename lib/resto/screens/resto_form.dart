@@ -202,8 +202,6 @@ class _RestoFormPageState extends State<RestoFormPage> {
                     ),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                          // Kirim ke Django dan tunggu respons
-                          // TODO: Ganti URL dan jangan lupa tambahkan trailing slash (/) di akhir URL!
                           final response = await request.postJson(
                               "http://127.0.0.1:8000/resto/create-flutter/",
                               jsonEncode(<String, String>{
@@ -213,7 +211,6 @@ class _RestoFormPageState extends State<RestoFormPage> {
                                   'image': _foodImage,
                                   'promo': _foodPromo,
                                   'lokasi': _location,
-                              // TODO: Sesuaikan field data sesuai dengan aplikasimu
                               }),
                           );
                           if (context.mounted) {
@@ -222,10 +219,8 @@ class _RestoFormPageState extends State<RestoFormPage> {
                                       .showSnackBar(const SnackBar(
                                   content: Text("Resto baru berhasil disimpan!"),
                                   ));
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => RestoPage()),
-                                  );
+                                  Navigator.pop(
+                                      context);
                               } else {
                                   ScaffoldMessenger.of(context)
                                       .showSnackBar(const SnackBar(
