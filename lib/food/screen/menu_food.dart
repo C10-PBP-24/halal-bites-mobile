@@ -7,14 +7,14 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 // import 'package:http/http.dart' as http;
 
-class MenuPage extends StatefulWidget {
-  const MenuPage({super.key});
+class FoodPage extends StatefulWidget {
+  const FoodPage({super.key});
 
   @override
-  State<MenuPage> createState() => _MenuPageState();
+  State<FoodPage> createState() => _FoodPageState();
 }
 
-class _MenuPageState extends State<MenuPage> {
+class _FoodPageState extends State<FoodPage> {
   Future<List<Food>> fetchFoods(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/menu/get_food/');
     // print('Response: $response');
