@@ -59,4 +59,7 @@ Saat menggunakan HalalBites, pengguna dapat mencari restoran, kafe, atau warung 
 
 ## vi. Tautan Desain Aplikasi
 [Tautan Desain Figma Desain Aplikasi](https://www.figma.com/design/BHCWjaXI58h5ZtYrAYyXxu/quick-free-food-app-design-figma-template?node-id=2-213&t=nWv16YRA59dMkxQC-1)
+
+## vii. Tautan APK Sementara (21/12/2024)
+[Tautan APK Sementara](https://install.appcenter.ms/orgs/c10_pbp/apps/halal-bites/distribution_groups/public/releases/2)
     
