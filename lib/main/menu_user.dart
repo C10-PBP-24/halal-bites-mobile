@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:halal_bites/auth/login.dart'; // Pastikan file LoginPage terimport
+import 'package:halal_bites/forum/screens/thread_list.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:halal_bites/food/screen/food_user.dart';
@@ -93,9 +94,11 @@ class MenuUserPage extends StatelessWidget {
                     "Forum",
                     Icons.forum,
                     Colors.brown,
-                    () {
-                      // Tambahkan navigasi ForumPage
-                    },
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ThreadPage()),
+                    ),
                   ),
                   _buildAnimatedButton(
                     context,
