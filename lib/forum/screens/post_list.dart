@@ -34,7 +34,7 @@ class _PostListPageState extends State<PostListPage> {
         'http://127.0.0.1:8000/forum/posts/$postId/delete/',
         {},
       );
-      
+
       if (response['status'] == 'success') {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -55,10 +55,12 @@ class _PostListPageState extends State<PostListPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.threadTitle),
-        backgroundColor: Colors.yellow,
+        backgroundColor: Colors.yellow[700],
+        centerTitle: true,
       ),
       body: FutureBuilder<List<Post>>(
         future: fetchPosts(request),
@@ -67,113 +69,117 @@ class _PostListPageState extends State<PostListPage> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            return ListView.builder(
-              padding: const EdgeInsets.all(8),
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final post = snapshot.data![index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              post.fields.user,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                if (post.fields.user == request.jsonData['username']) ...[
-                                  IconButton(
-                                    icon: const Icon(Icons.edit, size: 20),
-                                    onPressed: () async {
-                                      final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => EditPostForm(
-                                            postId: post.pk,
-                                            currentContent: post.fields.content,
-                                          ),
-                                        ),
-                                      );
-                                      
-                                      if (result == true) {
-                                        setState(() {}); // Refresh list
-                                      }
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, size: 20),
-                                    onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) => AlertDialog(
-                                          title: const Text('Konfirmasi'),
-                                          content: const Text(
-                                            'Apakah Anda yakin ingin menghapus post ini?'
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(context),
-                                              child: const Text('Batal'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                deletePost(request, post.pk);
-                                              },
-                                              child: const Text(
-                                                'Hapus',
-                                                style: TextStyle(color: Colors.red),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
-                                Text(
-                                  post.fields.createdAt.toString().split('.')[0],
-                                  style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          post.fields.content,
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
-          } else {
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
-              child: Text('Belum ada post dalam thread ini.'),
+              child: Text(
+                'Belum ada post dalam thread ini.',
+                style: TextStyle(fontSize: 20, color: Colors.grey),
+              ),
             );
           }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: snapshot.data!.length,
+            itemBuilder: (context, index) {
+              final post = snapshot.data![index];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                elevation: 3,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            post.fields.user,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              if (post.fields.user == request.jsonData['username']) ...[
+                                IconButton(
+                                  icon: const Icon(Icons.edit, color: Colors.blue),
+                                  onPressed: () async {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditPostForm(
+                                          postId: post.pk,
+                                          currentContent: post.fields.content,
+                                        ),
+                                      ),
+                                    );
+                                    
+                                    if (result == true) {
+                                      setState(() {}); // Refresh list
+                                    }
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text('Konfirmasi'),
+                                        content: const Text(
+                                          'Apakah Anda yakin ingin menghapus post ini?'
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            child: const Text('Batal'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              deletePost(request, post.pk);
+                                            },
+                                            child: const Text(
+                                              'Hapus',
+                                              style: TextStyle(color: Colors.red),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                              Text(
+                                post.fields.createdAt.toString().split('.')[0],
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        post.fields.content,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => PostFormPage(
@@ -182,9 +188,13 @@ class _PostListPageState extends State<PostListPage> {
               ),
             ),
           );
+          
+          if (result == true) {
+            setState(() {}); // Refresh the list when returning
+          }
         },
-        backgroundColor: Colors.yellow,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: Colors.yellow[700],
+        child: const Icon(Icons.add, color: Colors.black),
       ),
     );
   }
