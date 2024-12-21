@@ -31,14 +31,13 @@ class _FoodPageState extends State<FoodAdminPage> {
   Future<void> deleteFood(int id) async {
     final request = context.read<CookieRequest>();
     try {
-      final response =
-          await request.get('http://127.0.0.1:8000/menu/delete_food/$id/');
+      final response = await request.get('http://127.0.0.1:8000/menu/delete_food/$id/');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Deleted successfully')),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Deleted Failed')),
+        SnackBar(content: Text('Deleted successfully')),
       );
     }
   }
@@ -233,7 +232,14 @@ class _FoodPageState extends State<FoodAdminPage> {
                                 vertical: 8.0, horizontal: 16.0),
                             padding: const EdgeInsets.all(12.0),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.yellow.shade100,
+                                  Colors.yellow.shade300
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(

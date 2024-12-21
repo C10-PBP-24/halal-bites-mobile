@@ -252,7 +252,7 @@ class _RestoPageState extends State<RestoPageUser> {
                                   ),
                                   const SizedBox(height: 5),
                                   Text(
-                                    "Lokasi: ${lokasiValues.reverse[filteredList[index].fields.lokasi]}",
+                                    "Lokasi: ${resto.fields.lokasi}",
                                     style: const TextStyle(fontSize: 14.0),
                                   ),
                                 ],
