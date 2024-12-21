@@ -33,7 +33,7 @@ class _ThreadPageState extends State<ThreadPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Thread berhasil dihapus!")),
           );
-          setState(() {}); // Refresh the list
+          setState(() {}); 
         }
       }
     } catch (e) {
@@ -43,122 +43,6 @@ class _ThreadPageState extends State<ThreadPage> {
         );
       }
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Forum Threads',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: Colors.yellow[700],
-        centerTitle: true,
-      ),
-      body: FutureBuilder(
-        future: fetchThread(request),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final thread = snapshot.data![index];
-                return Card(
-                  margin: const EdgeInsets.all(8),
-                  child: ListTile(
-                    title: Text(
-                      thread.fields.title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Dibuat oleh: ${thread.fields.user}'),
-                        if (thread.fields.foods.isNotEmpty)
-                          FutureBuilder(
-                            future: getFoodNames(thread.fields.foods),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return Text('Foods: ${snapshot.data}');
-                              }
-                              return const SizedBox.shrink();
-                            },
-                          ),
-                      ],
-                    ),
-                    trailing: thread.fields.user == request.jsonData['username']
-                        ? Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit),
-                                onPressed: () async {
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => EditThreadForm(
-                                        threadId: thread.pk,
-                                        currentTitle: thread.fields.title,
-                                      ),
-                                    ),
-                                  );
-                                  
-                                  if (result == true) {
-                                    setState(() {}); // Refresh list jika edit berhasil
-                                  }
-                                },
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete),
-                                onPressed: () => deleteThread(request, thread.pk),
-                              ),
-                            ],
-                          )
-                        : null,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PostListPage(
-                            threadId: thread.pk,
-                            threadTitle: thread.fields.title,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-            );
-          } else {
-            return const Center(child: Text('Tidak ada thread.'));
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ThreadFormPage(),
-            ),
-          );
-        },
-        backgroundColor: Colors.yellow,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-    );
   }
 
   Future<String> getFoodNames(List<int> foodIds) async {
@@ -184,5 +68,186 @@ class _ThreadPageState extends State<ThreadPage> {
       print('Error getting food names: $e');
       return '';
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Forum Threads',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.yellow[700],
+        centerTitle: true,
+      ),
+      body: FutureBuilder<List<Thread>>(
+        future: fetchThread(request),
+        builder: (context, AsyncSnapshot<List<Thread>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text(
+                'Belum ada thread.',
+                style: TextStyle(fontSize: 20, color: Colors.grey),
+              ),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: snapshot.data!.length,
+            padding: const EdgeInsets.all(8),
+            itemBuilder: (context, index) {
+              final thread = snapshot.data![index];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                elevation: 3,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PostListPage(
+                          threadId: thread.pk,
+                          threadTitle: thread.fields.title,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                thread.fields.title,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            if (thread.fields.user == request.jsonData['username'])
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, color: Colors.blue),
+                                    onPressed: () async {
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => EditThreadForm(
+                                            threadId: thread.pk,
+                                            currentTitle: thread.fields.title,
+                                          ),
+                                        ),
+                                      );
+                                      if (result == true) {
+                                        setState(() {});
+                                      }
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () => showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text('Konfirmasi'),
+                                        content: const Text(
+                                          'Apakah Anda yakin ingin menghapus thread ini?'
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            child: const Text('Batal'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              deleteThread(request, thread.pk);
+                                            },
+                                            child: const Text(
+                                              'Hapus',
+                                              style: TextStyle(color: Colors.red),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Dibuat oleh: ${thread.fields.user}',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                        ),
+                        if (thread.fields.foods.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          FutureBuilder<String>(
+                            future: getFoodNames(thread.fields.foods),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                                return Text(
+                                  'Makanan: ${snapshot.data}',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                        ],
+                        const SizedBox(height: 8),
+                        Text(
+                          'Dibuat pada: ${thread.fields.createdAt.toString().split('.')[0]}',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const ThreadFormPage(),
+            ),
+          );
+          if (result == true) {
+            setState(() {});
+          }
+        },
+        backgroundColor: Colors.yellow[700],
+        child: const Icon(Icons.add, color: Colors.black),
+      ),
+    );
   }
 }
