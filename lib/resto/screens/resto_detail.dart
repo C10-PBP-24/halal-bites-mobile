@@ -230,7 +230,7 @@ class RestoDetailPage extends StatelessWidget {
               // Location Section
               _buildInfoSection(
                 title: 'Location',
-                content: lokasiValues.reverse[resto.fields.lokasi] ?? 'Unknown',
+                content: resto.fields.lokasi,
                 icon: Icons.location_on,
               ),
 

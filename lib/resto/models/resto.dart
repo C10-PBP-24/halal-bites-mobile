@@ -35,7 +35,7 @@ class Resto {
 class Fields {
     String nama;
     int makanan;
-    Lokasi lokasi;
+    String lokasi;
 
     Fields({
         required this.nama,
@@ -46,33 +46,15 @@ class Fields {
     factory Fields.fromJson(Map<String, dynamic> json) => Fields(
         nama: json["nama"],
         makanan: json["makanan"],
-        lokasi: lokasiValues.map[json["lokasi"]]!,
+        lokasi: json["lokasi"],
     );
 
     Map<String, dynamic> toJson() => {
         "nama": nama,
         "makanan": makanan,
-        "lokasi": lokasiValues.reverse[lokasi],
+        "lokasi": lokasi,
     };
 }
-
-enum Lokasi {
-    BRAGA,
-    CIBADUYUT,
-    CIHAMPELAS,
-    DAGO,
-    LEMBANG,
-    SETIABUDI
-}
-
-final lokasiValues = EnumValues({
-    "Braga": Lokasi.BRAGA,
-    "Cibaduyut": Lokasi.CIBADUYUT,
-    "Cihampelas": Lokasi.CIHAMPELAS,
-    "Dago": Lokasi.DAGO,
-    "Lembang": Lokasi.LEMBANG,
-    "Setiabudi": Lokasi.SETIABUDI
-});
 
 enum Model {
     RESTO_RESTO
