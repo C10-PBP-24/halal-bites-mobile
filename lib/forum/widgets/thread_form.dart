@@ -20,25 +20,26 @@ class _ThreadFormPageState extends State<ThreadFormPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'Buat Thread Baru',
+        title: const Text(
+          'Buat Thread Baru',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.yellow[700],
+        centerTitle: true,
       ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                TextFormField(
                   decoration: InputDecoration(
                     hintText: "Judul Thread",
                     labelText: "Judul Thread",
@@ -48,88 +49,81 @@ class _ThreadFormPageState extends State<ThreadFormPage> {
                   ),
                   onChanged: (String? value) {
                     setState(() {
-                      _title = value!;
+                      _title = value ?? "";
                     });
                   },
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
-                      return "Judul tidak boleh kosong!";
+                      return 'Judul tidak boleh kosong';
                     }
                     return null;
                   },
                 ),
-              ),
-              
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  maxLines: 5,
+                const SizedBox(height: 16),
+                TextFormField(
                   decoration: InputDecoration(
                     hintText: "Konten Thread",
-                    labelText: "Konten Thread",
+                    labelText: "Konten",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),
                   ),
+                  maxLines: 5,
                   onChanged: (String? value) {
                     setState(() {
-                      _content = value!;
+                      _content = value ?? "";
                     });
                   },
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
-                      return "Konten tidak boleh kosong!";
+                      return 'Konten tidak boleh kosong';
                     }
                     return null;
                   },
                 ),
-              ),
-
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.bottomCenter,
                   child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.blue),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow[700],
+                      foregroundColor: Colors.black,
                     ),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         final response = await request.postJson(
-                          "http://127.0.0.1:8000/threads/create-flutter/",
-                          jsonEncode(<String, dynamic>{
+                          "http://127.0.0.1:8000/forum/create_thread_ajax/",
+                          jsonEncode({
                             'title': _title,
                             'content': _content,
                             'foods': _foods,
                           }),
                         );
+                        
                         if (context.mounted) {
                           if (response['status'] == 'success') {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(
-                              content: Text("Thread berhasil dibuat!"),
-                            ));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Thread berhasil dibuat!")),
+                            );
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (context) => const ThreadPage()),
                             );
                           } else {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(
-                              content: Text("Terdapat kesalahan, silakan coba lagi."),
-                            ));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Terdapat kesalahan, silakan coba lagi."),
+                              ),
+                            );
                           }
                         }
                       }
                     },
-                    child: const Text(
-                      "Simpan",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: const Text('Simpan'),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

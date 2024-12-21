@@ -32,7 +32,7 @@ class _PostFormPageState extends State<PostFormPage> {
             'Buat Post Baru',
           ),
         ),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.yellow,
         foregroundColor: Colors.white,
       ),
       body: Form(
@@ -70,9 +70,27 @@ class _PostFormPageState extends State<PostFormPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        // Handle form submission
+                        final response = await request.postJson(
+                          "http://127.0.0.1:8000/forum/create_post_ajax/${widget.threadId}/",
+                          jsonEncode(<String, dynamic>{
+                            'content': _content,
+                          }),
+                        );
+                        
+                        if (context.mounted) {
+                          if (response['status'] == 'success') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Post berhasil dibuat!")),
+                            );
+                            Navigator.pop(context);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Terdapat kesalahan, silakan coba lagi.")),
+                            );
+                          }
+                        }
                       }
                     },
                     child: const Text('Submit'),

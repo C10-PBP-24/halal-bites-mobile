@@ -39,7 +39,7 @@ class _EditPostFormState extends State<EditPostForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Post'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.yellow,
       ),
       body: Form(
         key: _formKey,
@@ -67,7 +67,7 @@ class _EditPostFormState extends State<EditPostForm> {
                   if (_formKey.currentState!.validate()) {
                     try {
                       final response = await request.post(
-                        'http://127.0.0.1:8000/posts/${widget.postId}/edit/',
+                        'http://127.0.0.1:8000/forum/posts/${widget.postId}/edit/',
                         {'content': _contentController.text},
                       );
 

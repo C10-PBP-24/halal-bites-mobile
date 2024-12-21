@@ -39,7 +39,7 @@ class _EditThreadFormState extends State<EditThreadForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Thread'),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.yellow,
       ),
       body: Form(
         key: _formKey,
@@ -66,7 +66,7 @@ class _EditThreadFormState extends State<EditThreadForm> {
                   if (_formKey.currentState!.validate()) {
                     try {
                       final response = await request.post(
-                        'http://127.0.0.1:8000/threads/${widget.threadId}/edit/',
+                        'http://127.0.0.1:8000/forum/threads/${widget.threadId}/edit/',
                         {'title': _titleController.text},
                       );
 

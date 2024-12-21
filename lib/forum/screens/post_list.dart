@@ -23,7 +23,7 @@ class PostListPage extends StatefulWidget {
 class _PostListPageState extends State<PostListPage> {
   Future<List<Post>> fetchPosts(CookieRequest request) async {
     final response = await request.get(
-      'http://127.0.0.1:8000/threads/${widget.threadId}/json/'
+      'http://127.0.0.1:8000/forum/threads/${widget.threadId}/json/'
     );
     return postFromJson(jsonEncode(response));
   }
@@ -31,7 +31,7 @@ class _PostListPageState extends State<PostListPage> {
   Future<void> deletePost(CookieRequest request, int postId) async {
     try {
       final response = await request.post(
-        'http://127.0.0.1:8000/posts/$postId/delete/',
+        'http://127.0.0.1:8000/forum/posts/$postId/delete/',
         {},
       );
       
@@ -58,7 +58,7 @@ class _PostListPageState extends State<PostListPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.threadTitle),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.yellow,
       ),
       body: FutureBuilder<List<Post>>(
         future: fetchPosts(request),
@@ -183,7 +183,7 @@ class _PostListPageState extends State<PostListPage> {
             ),
           );
         },
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.yellow,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
