@@ -233,7 +233,11 @@ class _FoodPageState extends State<FoodAdminPage> {
                                 vertical: 8.0, horizontal: 16.0),
                             padding: const EdgeInsets.all(12.0),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              gradient: LinearGradient(
+                              colors: [Colors.yellow.shade100, Colors.yellow.shade300],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
