@@ -70,7 +70,7 @@ class _ThreadPageState extends State<ThreadPage> {
                       itemBuilder: (context, index) {
                         return Card(
                           child: ListTile(
-                            title: Text(snapshot.data![index].fields.content),
+                            title: Text(snapshot.data![index].fields.title),
                             subtitle: Text('By ${snapshot.data![index].fields.user}'),
                           ),
                         );

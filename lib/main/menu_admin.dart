@@ -3,6 +3,7 @@ import 'package:halal_bites/food_tracker/screens/food_tracker.dart';
 import 'package:halal_bites/rating/screens/rated_foods.dart';
 import 'package:halal_bites/resto/screens/list_resto_admin.dart';
 import 'package:halal_bites/food/screen/food_admin.dart';
+import 'package:halal_bites/forum/screens/thread_list.dart';
 import 'package:halal_bites/auth/login.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
@@ -92,9 +93,11 @@ class MenuAdminPage extends StatelessWidget {
                     "Forum",
                     Icons.forum,
                     Colors.brown,
-                    () {
-                      // Tambahkan navigasi ForumPage
-                    },
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ThreadPage()),
+                    ),
                   ),
                   _buildAnimatedButton(
                     context,
