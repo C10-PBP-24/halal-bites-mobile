@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:halal_bites/forum/models/post_entry.dart';
+import 'package:halal_bites/forum/widgets/post_form.dart';
+import 'package:halal_bites/forum/widgets/edit_post_form.dart';
 
 class PostListPage extends StatefulWidget {
   final int threadId;
@@ -21,9 +23,33 @@ class PostListPage extends StatefulWidget {
 class _PostListPageState extends State<PostListPage> {
   Future<List<Post>> fetchPosts(CookieRequest request) async {
     final response = await request.get(
-      'http://127.0.0.1:8000/threads/${widget.threadId}/json/'
+      'http://127.0.0.1:8000/forum/threads/${widget.threadId}/json/'
     );
     return postFromJson(jsonEncode(response));
+  }
+
+  Future<void> deletePost(CookieRequest request, int postId) async {
+    try {
+      final response = await request.post(
+        'http://127.0.0.1:8000/forum/posts/$postId/delete/',
+        {},
+      );
+      
+      if (response['status'] == 'success') {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Post berhasil dihapus!")),
+          );
+          setState(() {}); // Refresh the list
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Gagal menghapus post")),
+        );
+      }
+    }
   }
 
   @override
@@ -32,7 +58,7 @@ class _PostListPageState extends State<PostListPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.threadTitle),
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.yellow,
       ),
       body: FutureBuilder<List<Post>>(
         future: fetchPosts(request),
@@ -64,12 +90,66 @@ class _PostListPageState extends State<PostListPage> {
                                 fontSize: 16,
                               ),
                             ),
-                            Text(
-                              post.fields.createdAt.toString().split('.')[0],
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                              ),
+                            Row(
+                              children: [
+                                if (post.fields.user == request.jsonData['username']) ...[
+                                  IconButton(
+                                    icon: const Icon(Icons.edit, size: 20),
+                                    onPressed: () async {
+                                      final result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => EditPostForm(
+                                            postId: post.pk,
+                                            currentContent: post.fields.content,
+                                          ),
+                                        ),
+                                      );
+                                      
+                                      if (result == true) {
+                                        setState(() {}); // Refresh list
+                                      }
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete, size: 20),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text('Konfirmasi'),
+                                          content: const Text(
+                                            'Apakah Anda yakin ingin menghapus post ini?'
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(context),
+                                              child: const Text('Batal'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                deletePost(request, post.pk);
+                                              },
+                                              child: const Text(
+                                                'Hapus',
+                                                style: TextStyle(color: Colors.red),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                                Text(
+                                  post.fields.createdAt.toString().split('.')[0],
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -93,9 +173,17 @@ class _PostListPageState extends State<PostListPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Implementasi untuk menambah post baru
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PostFormPage(
+                threadId: widget.threadId,
+                threadTitle: widget.threadTitle,
+              ),
+            ),
+          );
         },
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.yellow,
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
