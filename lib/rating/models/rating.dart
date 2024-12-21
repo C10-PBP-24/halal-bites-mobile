@@ -26,15 +26,9 @@ class Rating {
     });
 
     factory Rating.fromJson(Map<String, dynamic> json) => Rating(
-        id: json["id"].toString(),
-        food: Food(
-            id: json["food_id"].toString(),
-            name: json["food__name"],
-        ),
-        user: User(
-            id: json["user_id"].toString(),
-            username: json["user__username"],
-        ),
+        id: json["id"],
+        food: Food.fromJson(json["food"]),
+        user: User.fromJson(json["user"]),
         rating: json["rating"],
         description: json["description"],
         createdAt: DateTime.parse(json["created_at"]),
@@ -42,10 +36,8 @@ class Rating {
 
     Map<String, dynamic> toJson() => {
         "id": id,
-        "food_id": food.id,
-        "food__name": food.name,
-        "user_id": user.id,
-        "user__username": user.username,
+        "food": food.toJson(),
+        "user": user.toJson(),
         "rating": rating,
         "description": description,
         "created_at": createdAt.toIso8601String(),
@@ -55,20 +47,24 @@ class Rating {
 class Food {
     String id;
     String name;
+    String? imageUrl; // Added
 
     Food({
         required this.id,
         required this.name,
+        this.imageUrl,
     });
 
     factory Food.fromJson(Map<String, dynamic> json) => Food(
-        id: json["id"].toString(),
+        id: json["id"],
         name: json["name"],
+        imageUrl: json["image_url"], // Parse image_url
     );
 
     Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
+        "image_url": imageUrl,
     };
 }
 
@@ -82,7 +78,7 @@ class User {
     });
 
     factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json["id"].toString(),
+        id: json["id"],
         username: json["username"],
     );
 
